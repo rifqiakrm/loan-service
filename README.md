@@ -1,7 +1,9 @@
 # 💸 Amartha Loan Service API
 
-A backend API for managing the full lifecycle of a loan — from application to approval, investment, and disbursement.  
+A backend API for managing the full lifecycle of a loan from application to approval, investment, and disbursement.  
 Built with **Go**, **Gin**, and Testify.
+
+This was developed as part of the Amartha engineering coding test.
 
 ---
 
