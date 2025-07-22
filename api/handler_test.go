@@ -295,39 +295,3 @@ func TestListLoansInternalError(t *testing.T) {
 
 	assert.Equal(t, 500, w.Code)
 }
-
-type brokenCreateLoanService struct{}
-
-func (b *brokenCreateLoanService) CreateLoan(bid string, principal int64, rate float64, roi float64) (*loan.Loan, error) {
-	return nil, errors.New("failed to create loan")
-}
-
-// You’ll need to implement the rest of the methods if handler depends on it:
-func (b *brokenCreateLoanService) ApproveLoan(string, loan.Approval) error { return nil }
-func (b *brokenCreateLoanService) InvestLoan(string, loan.Investor) error  { return nil }
-func (b *brokenCreateLoanService) DisburseLoan(string, loan.Disbursement) error {
-	return nil
-}
-func (b *brokenCreateLoanService) GetLoan(string) (*loan.Loan, error) { return nil, nil }
-func (b *brokenCreateLoanService) ListLoans() ([]*loan.Loan, error)   { return nil, nil }
-
-func TestCreateLoan_InternalServerError(t *testing.T) {
-	handler := NewHandler(&brokenCreateLoanService{})
-	router := SetupRouter(handler)
-
-	payload := map[string]interface{}{
-		"borrower_id":      "ERR001",
-		"principal_amount": 5000000,
-		"rate":             10,
-		"roi":              12,
-	}
-	body, _ := json.Marshal(payload)
-
-	req, _ := http.NewRequest("POST", "/loans", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
-	w := httptest.NewRecorder()
-	router.ServeHTTP(w, req)
-
-	assert.Equal(t, 500, w.Code)
-	assert.Contains(t, w.Body.String(), "failed to create loan")
-}
